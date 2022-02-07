@@ -53,6 +53,8 @@ namespace Cms20LinqOchAnnat
                 return shouldBeInResult;
             }).ToList();
 
+            //Ta fram alla som gjort något mål mot Edmonton
+
 
 
 
@@ -81,8 +83,27 @@ namespace Cms20LinqOchAnnat
             var players = ReadAllFromFile();
             SetupGameResults(players);
 
+
+            //Ta fram ALLA spelare som gjort mål nån gång mpt  EDM
+            var res = players.Where(player=> player.BestGames.Any(game=>game.AgainstTeam == "EDM" && game.Goals > 0) ).ToList();
+
+
+            res = players.Where(player =>
+            {
+                bool hasScoredAgainstEdm = false;
+                foreach (var game in player.BestGames)
+                {
+                    if (game.AgainstTeam == "EDM" && game.Goals > 0)
+                        hasScoredAgainstEdm = true;
+                }
+                return hasScoredAgainstEdm;
+            }).ToList();
+
             //EXTENSION METHODS
             int c = players.Count();
+
+
+
 
             //int antalLegendariska = CountLegends(players);
             int antalLegendariska = players.CountLegends();
