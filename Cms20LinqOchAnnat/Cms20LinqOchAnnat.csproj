@@ -9,4 +9,8 @@
     <PackageReference Include="CsvHelper" Version="15.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
+  </ItemGroup>
+
 </Project>

@@ -4,18 +4,43 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Cms20LinqOchAnnat
 {
     class Program
     {
-
+        private static Random rnd = new Random();
+        static void SetupGameResults(Player player, List<string> orderTeams)
+        {
+            player.BestGames = new List<GameResult>();
+            for (int i = 0; i < rnd.Next(0, 80);i++)
+            {
+                var g = new GameResult();
+                g.Assists = rnd.Next(0, 3);
+                g.Goals = rnd.Next(0, 2);
+                g.Date = DateTime.Now.AddDays(-rnd.Next(0, 600));
+                g.AgainstTeam = orderTeams[rnd.Next(0, orderTeams.Count)];
+                player.BestGames.Add(g);
+            }
+        }
+        static void SetupGameResults(IEnumerable<Player> players)
+        {
+            foreach (var p in players)
+            {
+                var orderTeams = players.Select(e => e.Team).Where(e => e != p.Team).ToList();
+                SetupGameResults(p, orderTeams);
+            }
+        }
         static bool FilterPlayer(Player p)
         {
             if(p.GamesPlayed > 100)
                 return true;
             return false;
         }
+
+
+        // int antalLegendariska = CountLegends(players);
 
         static void Main(string[] args)
         {
@@ -28,27 +53,54 @@ namespace Cms20LinqOchAnnat
                 return shouldBeInResult;
             }).ToList();
 
-            for(int i = 0; i < 10; i++)
-            {
-                Console.WriteLine(i);
-            }
 
-            var listan = allaTal.Where(tal => tal < 100).ToList();
-            foreach (var i in listan)
-            {
-                Console.WriteLine(i);
-            }
 
-            foreach (var i in allaTal.Where(tal => tal < 100))
-            {
-                Console.WriteLine(i);
-            }
+
+
+
+            //for(int i = 0; i < 10; i++)
+            //{
+            //    Console.WriteLine(i);
+            //}
+
+            //var listan = allaTal.Where(tal => tal < 100).ToList();
+            //foreach (var i in listan)
+            //{
+            //    Console.WriteLine(i);
+            //}
+
+            //foreach (var i in allaTal.Where(tal => tal < 100))
+            //{
+            //    Console.WriteLine(i);
+            //}
 
 
             //_dbContext.Players.Include(e=>e.Team)
 
 
             var players = ReadAllFromFile();
+            SetupGameResults(players);
+
+            //EXTENSION METHODS
+            int c = players.Count();
+
+            //int antalLegendariska = CountLegends(players);
+            int antalLegendariska = players.CountLegends();
+
+
+
+
+            var hej = new { Namn = "Stefan", Age=22,  Jersey=13  };
+
+
+            var enlista = players.Select(player => new { player.Name, player.Points, 
+                antalTeamates = players.Count(p=>p.Team == player.Team && p.Name != player.Name),
+                doublePoints =  player.Points * 2 }).ToList();
+
+
+            var enlista2 = players.Select(player => new { player.Name, player.Points, player.Team }).ToList();
+
+
 
             Console.Write("Mata in lag att filtrera på:");
             var teamFilter = Console.ReadLine();
@@ -141,37 +193,16 @@ namespace Cms20LinqOchAnnat
 
 
             // Skriv ut spelaren "Stefan Holmberg" poäng
-            player = players.FirstOrDefault(r => r.Name == "Stefan Holmberg");
-            //ANTINGEN OBJEKTET eller NULL
-            // Men den kraschar inte
-            if (player == null)
-                Console.WriteLine("Den nollan finns ju inte i topp 100 i NHL dummer");
+            
+            // SELECT
+
+            // select *
+            //select name, points from players
 
 
-
-            //Alla vars namn börjar på P
-
-
-            //foreach (var player2 in players.Where(p => FilterPlayer(p)))
-            //{
-            //    Console.WriteLine(player2.Name);
-            //}
-
-            //LAMBDA EXPRESSION Where -> True eller false
-
-            foreach (var player2 in players.Where(p => 
-                p.Name.StartsWith("P") && (p.Team == "EDM" || p.Team == "NYR") ))
-            { 
-                Console.WriteLine(player2.Name); 
-            }
-
-
-
-            foreach (var player2 in players.OrderBy(p => p.Name ))
-            {
-                Console.WriteLine(player2.Name);
-            }
-
+            // Anonyma objekt
+            // Nested objekts - any osv
+            // Extension methods
 
 
             //var file = File.OpenText("c:\\hello.txt");
